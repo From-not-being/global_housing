@@ -1,59 +1,53 @@
-import csv
+import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
-import numpy as np
 
-housing_path = "/content/drive/MyDrive/Colab Notebooks/global_housing.csv"
+global_housing_path = "/content/drive/MyDrive/Colab Notebooks/global_housing.csv"
+df_housing = pd.read_csv(global_housing_path)
 
-def run_housing_robust(file_path):
-    X, y = [], []
+display(df_housing.head(3))
+print(df_housing.columns)
 
-    with open(file_path, 'r', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
+# Pfad zu deiner global housing CSV
+path = "/content/drive/MyDrive/Colab Notebooks/global_housing.csv"
 
-        actual_columns = reader.fieldnames
-        print(f"Gefundene Spalten in der Datei: {actual_columns}")
+def makro_korrelation_housing(file_path):
+    print("Lade makroökonomische Daten...\n")
+    df = pd.read_csv(file_path)
 
-        # Define the actual columns to use from the CSV
-        feature_cols = ['Rent Index', 'Affordability Ratio', 'Mortgage Rate (%)', 'Inflation Rate (%)', 'GDP Growth (%)']
-        target_col = 'House Price Index'
+    # --- 1. SPALTENNAMEN (Bitte exakt an deine CSV anpassen!) ---
+    features = ['Mortgage Rate (%)', 'Inflation Rate (%)', 'Population Growth (%)']
+    target = 'House Price Index'
 
-        for i, r in enumerate(reader):
-            try:
-                # Extract features and target using actual column names
-                features = [
-                    float(r.get(col, 0)) for col in feature_cols
-                ]
-                target = float(r.get(target_col, 0))
+    # Leere Felder (NaN) entfernen, sonst stürzt die Mathematik ab
+    df = df.dropna(subset=features + [target])
 
-                # Only add data if all required columns were found and converted successfully
-                if all(col in r and r[col] for col in feature_cols + [target_col]): # Check for existence and non-empty string
-                    X.append(features)
-                    y.append(target)
-                else:
-                    # Skip rows where essential data is missing or empty
-                    print(f"Skipping row {i+1} due to missing or empty essential data.")
+    # --- 2. DIE KLASSISCHE KORRELATION (Gibt es einen direkten Zusammenhang?) ---
+    print("=== 1. Lineare Korrelation (Pearson) ===")
+    print("Werte nahe +1.0 = Preis steigt mit; Werte nahe -1.0 = Preis fällt; 0 = Kein Zusammenhang\n")
 
-            except ValueError as e:
-                print(f"Skipping row {i+1} due to data conversion error: {e}")
-                continue # Skip rows with conversion errors
+    # Wir korrelieren nur unsere ausgewählten Spalten miteinander
+    korrelations_matrix = df[features + [target]].corr()
 
-    if not X:
-        print("❌ Fehler: Keine Daten konnten extrahiert werden. Prüfe die Spaltennamen und Daten im CSV!")
-        return
+    # Wir schauen uns nur die Spalte an, die zeigt, wie alles mit dem Preis zusammenhängt
+    preis_korrelation = korrelations_matrix[target].drop(target)
+    for feature, wert in preis_korrelation.items():
+        richtung = "zieht Preis HOCH" if wert > 0 else "drückt Preis RUNTER"
+        print(f"-> {feature}: {wert:+.2f} ({richtung})")
 
-    # Model Training
+    # --- 3. DIE ABSOLUTE WIRKUNGSKRAFT (Scikit-Learn Random Forest) ---
+    print("\n=== 2. KI-Einfluss-Analyse (Scikit-Learn Feature Importance) ===")
+    print("Welcher Faktor hat das meiste Gewicht bei der Preisbildung?\n")
+
+    X = df[features]
+    y = df[target]
+
+    # Modell trainieren (ohne Train/Test-Split, da wir hier nur die Gewichtung analysieren)
     model = RandomForestRegressor(n_estimators=100, random_state=42)
     model.fit(X, y)
 
-    print("\n✅ Erfolg! Scikit-Learn Modell trainiert.")
-    print(f"Anzahl verarbeiteter Datensätze: {len(X)}")
-
-    # Feature Importance
     importances = model.feature_importances_
-    features_names = feature_cols # Use the actual feature column names for importance display
+    for feature, imp in zip(features, importances):
+        print(f"-> {feature}: {imp * 100:.2f} % Gesamt-Einfluss")
 
-    print("\n📊 Wichtigste Preistreiber (für 'House Price Index'):")
-    for name, imp in zip(features_names, importances):
-        print(f"{name}: {imp:.2%}")
-
-run_housing_robust(housing_path)
+# Skript starten
+makro_korrelation_housing(path)
