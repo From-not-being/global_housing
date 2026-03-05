@@ -1,0 +1,39 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Data for Germany (Index: 1991 = 100)
+# Sources: Destatis (Federal Statistical Office), Trading Economics, CEIC Data
+data = {
+    'Year': [1991, 1995, 2000, 2005, 2010, 2015, 2020, 2024],
+    'Total_CPI': [100.0, 114.7, 122.0, 131.7, 142.3, 152.7, 161.6, 192.7],
+    'Housing_Rent': [100.0, 125.0, 145.0, 158.0, 175.0, 184.0, 196.1, 218.8],
+    'Food': [100.0, 108.0, 115.0, 122.0, 135.0, 148.0, 160.0, 215.0],
+    'Clothing': [100.0, 107.0, 111.0, 112.5, 114.0, 118.0, 120.0, 135.0],
+    'Nominal_Wages': [100.0, 124.5, 127.4, 145.0, 176.1, 197.2, 217.0, 256.6]
+}
+
+df = pd.DataFrame(data)
+
+# Save to CSV
+df.to_csv('germany_cost_wage_trends.csv', index=False)
+
+# Plotting
+plt.figure(figsize=(12, 7))
+plt.plot(df['Year'], df['Nominal_Wages'], label='Nominal Wages (Gross)', color='blue', linewidth=3, marker='o')
+plt.plot(df['Year'], df['Housing_Rent'], label='Housing & Rent', color='red', linewidth=2, linestyle='--', marker='s')
+plt.plot(df['Year'], df['Food'], label='Food & Non-Alcoholic Beverages', color='green', linewidth=2, linestyle='-.', marker='^')
+plt.plot(df['Year'], df['Total_CPI'], label='Total Consumer Prices (Inflation)', color='black', linewidth=2, alpha=0.6)
+plt.plot(df['Year'], df['Clothing'], label='Clothing & Footwear', color='orange', linewidth=2, linestyle=':', marker='v')
+
+plt.title('Cost of Living vs. Wages in Germany (1991-2024)', fontsize=16)
+plt.xlabel('Year', fontsize=12)
+plt.ylabel('Index (1991 = 100)', fontsize=12)
+plt.grid(True, which='both', linestyle='--', alpha=0.7)
+plt.legend(loc='upper left', fontsize=10)
+plt.annotate('Base Year: 1991 = 100', xy=(1991, 100), xytext=(1995, 80),
+             arrowprops=dict(facecolor='black', shrink=0.05), fontsize=10)
+
+plt.tight_layout()
+plt.savefig('germany_trends_graph.png')
+
+print("Graph and CSV generated.")
