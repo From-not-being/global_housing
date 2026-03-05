@@ -1,0 +1,50 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Daten (Geschätzte monatliche Durchschnittswerte in EUR für 2026)
+countries = ['USA', 'Deutschland', 'England (UK)', 'Belgien', 'Japan']
+
+# Variablen:
+# 1. Gehalt (Durchschnittliches Netto-Monatseinkommen)
+salary = [4800, 3000, 3600, 2750, 2850]
+# 2. Lebenshaltungskosten (Miete, Energie, Grundnahrungsmittel)
+living_costs = [2900, 1850, 2200, 1650, 1550]
+# 3. Sonstige Ausgaben (Freizeit, Kleidung, Versicherung, Mobilität)
+other_expenses = [1100, 750, 850, 650, 700]
+
+x = np.arange(len(countries))  
+width = 0.25  
+
+fig, ax = plt.subplots(figsize=(12, 7))
+
+# Balken erstellen
+rects1 = ax.bar(x - width, salary, width, label='Gehalt (Netto)', color='#2ecc71')
+rects2 = ax.bar(x, living_costs, width, label='Lebenshaltungskosten', color='#e74c3c')
+rects3 = ax.bar(x + width, other_expenses, width, label='Sonstige Ausgaben', color='#3498db')
+
+# Achsenbeschriftung und Titel
+ax.set_ylabel('Betrag in EUR (€)', fontsize=12)
+ax.set_title('Finanzielle Übersicht 2026: Gehalt vs. Ausgaben im Ländervergleich', fontsize=16, fontweight='bold')
+ax.set_xticks(x)
+ax.set_xticklabels(countries, fontsize=11)
+ax.legend(fontsize=10)
+
+# Raster hinzufügen
+ax.yaxis.grid(True, linestyle='--', alpha=0.7)
+
+# Zahlen über den Balken anzeigen
+def autolabel(rects):
+    for rect in rects:
+        height = rect.get_height()
+        ax.annotate(f'{height}',
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 3),  
+                    textcoords="offset points",
+                    ha='center', va='bottom', fontsize=9)
+
+autolabel(rects1)
+autolabel(rects2)
+autolabel(rects3)
+
+plt.tight_layout()
+plt.savefig('laendervergleich_finanzen_2026.png')
