@@ -8,3 +8,7 @@ The problem I solve: I calculate pricing strategies with data-driven mathematica
 Technical implementation: This machine learning pipeline correlates global market data (e.g., mortgage rates, inflation) with housing prices, utilizing a Random Forest Regressor to calculate the precise percentage weight of each economic driver.
 
 Your ROI: Management receives a validated risk and pricing model to forecast market fluctuations and mathematically secure investment or lending decisions.
+
+
+
+<img width="989" height="589" alt="mortgage rate, inflation rate, population growth" src="https://github.com/user-attachments/assets/e1f88cc7-7f9a-4818-8b93-0aacf5b140a4" />
